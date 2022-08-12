@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  flask:
+    build:
+      context: .
+      dockerfile: ./docker/flask/Dockerfile
+    image: flask_local
+    container_name: flask_local
+    platform: linux/x86_64
+    ports:
+      # HOST:CONTAINER
+      - "5000:5000"
+    command: /start
