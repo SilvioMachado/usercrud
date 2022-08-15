@@ -1,46 +1,46 @@
-version: '3'
+version: '3.1'
 
 volumes:
   # Omit data value so docker manages the data folder. If we don't explicitly say that we
   # want to ignore where the data folder is, the container seems to lose data everytime.
-  postgres_data: {}
+  postgres_production_data: {}
 
 services:
   flask:
     build:
       context: .
-      dockerfile: ./docker/local/flask/Dockerfile
-    image: flask_local
-    container_name: flask_local
+      dockerfile: ./docker/production/flask/Dockerfile
+    image: flask_production
+    container_name: flask_production
     platform: linux/x86_64
     ports:
       # HOST:CONTAINER
-      - "5000:5000"
+      - "8000:8000"
     volumes:
       - .:/app:z
     command: /start
     depends_on:
       - postgres
 
+  nginx:
+    image: nginx:1.23.1
+    container_name: nginx_production
+    volumes:
+      - ./docker/production/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+    depends_on:
+      - flask
+
   postgres:
     image: postgres:14.1
-    container_name: postgres_local
+    container_name: postgres_production
     ports:
       # HOST:CONTAINER
       - "5432:5432"
     volumes:
-      -   postgres_data:/var/lib/postgresql/data
+      - postgres_production_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=local
       - POSTGRES_DB=usercrud
-
-  pg_admin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    ports:
-      # HOST:CONTAINER
-      - "80:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com.br
-      - PGADMIN_DEFAULT_PASSWORD=admin
