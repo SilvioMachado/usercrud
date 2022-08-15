@@ -11,6 +11,7 @@ config/
 requirements/
 ├─ # Add any new python dependency here to be installed
 src/
+├─ __init__.py  # The application Factory
 ├─ database/
 │  ├─ # Database related code
 ├─ blueprints/

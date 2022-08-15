@@ -59,11 +59,10 @@ def test_get_company(http_client, company_with_bank, fake_now):
 
 def test_create_company(http_client, fake_now):
     # Given
-
     path = '/company/'
     request_body = {
         'company_name': 'My Company',
-        'phone': '(11) 97823-5674',
+        'phone': '11978235674',
         'declared_billing': 123.02
     }
 
@@ -75,7 +74,7 @@ def test_create_company(http_client, fake_now):
     company = queryset.first()
 
     assert queryset.count() == 1
-    assert company.phone == '(11) 97823-5674'
+    assert company.phone == '11978235674'
     assert company.declared_billing == Decimal('123.02')
 
 
@@ -85,7 +84,7 @@ def test_create_company_with_bank_account(http_client, fake_now):
     path = '/company/'
     request_body = {
         'company_name': 'Company with bank account',
-        'phone': '(11) 97823-5674',
+        'phone': '11978235674',
         'declared_billing': 999.20,
         'bank_accounts': [
             {
@@ -97,7 +96,7 @@ def test_create_company_with_bank_account(http_client, fake_now):
     }
 
     # When
-    response = http_client.post(path, json=request_body)
+    http_client.post(path, json=request_body)
 
     # Then
     queryset = ClientCompany.query.filter_by(company_name='Company with bank account')
@@ -105,7 +104,7 @@ def test_create_company_with_bank_account(http_client, fake_now):
 
     # Company assertions
     assert queryset.count() == 1
-    assert company.phone == '(11) 97823-5674'
+    assert company.phone == '11978235674'
     assert company.declared_billing == Decimal('999.20')
 
     # Account assertions
@@ -238,4 +237,19 @@ def test_add_same_bank_account(http_client, company_with_bank):
     # Then
     refreshed_company = ClientCompany.query.get(_id)
     assert len(refreshed_company.bank_accounts) == 1
+    assert response.status_code == 400
+
+def test_invalid_create_company(http_client):
+    # Given
+    path = '/company/'
+    request_body = {
+        'company_name': 'My Company',
+        'phone': '11asd-978235674',    # Invalid Integer
+        'declared_billing': 123.02
+    }
+
+    # When
+    response = http_client.post(path, json=request_body)
+
+    # Then
     assert response.status_code == 400

@@ -1,9 +1,11 @@
 from flask import request
 
-from src.user.blueprint import blueprint
+from src.blueprints.company.blueprint import blueprint
 from src.database.models import ClientCompany, CompanyBankAccount
+from src.blueprints.company.validator import CompanyRequest, validate_request_body, BankRequest
 
 
+# Company Routes
 @blueprint.get('/<int:company_id>')
 def company_get(company_id):
     return ClientCompany.query.get_or_404(
@@ -12,6 +14,7 @@ def company_get(company_id):
 
 
 @blueprint.post('/')
+@validate_request_body(schema=CompanyRequest)
 def company_post():
     ClientCompany.create_from_dict(request.json)
     return ''
@@ -23,6 +26,16 @@ def company_delete(company_id):
     return ''
 
 
+@blueprint.put('/<int:company_id>')
+@validate_request_body(schema=CompanyRequest)
+def company_update(company_id):
+    client_company = ClientCompany.query.get_or_404(company_id)
+    client_company.update_from_dict(request.json)
+    return ''
+
+
+# Bank Model Routes
+@validate_request_body(schema=BankRequest)
 @blueprint.post('/<int:company_id>/bank_account')
 def add_bank_account(company_id):
     client_company = ClientCompany.query.get_or_404(company_id)
@@ -33,13 +46,7 @@ def add_bank_account(company_id):
     return ''
 
 
-@blueprint.put('/<int:company_id>')
-def company_update(company_id):
-    client_company = ClientCompany.query.get_or_404(company_id)
-    client_company.update_from_dict(request.json)
-    return ''
-
-
+@validate_request_body(schema=BankRequest)
 @blueprint.put('/account/<int:account_id>')
 def update_bank_account(account_id):
     bank_account = CompanyBankAccount.query.get(account_id)

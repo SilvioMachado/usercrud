@@ -1,7 +1,7 @@
 from flask import Flask
 
 from src.database.db import init_from_app
-from src.exceptions import InvalidException, handle_invalid_exception
+from src.exceptions import InvalidException, handle_bad_request
 
 app = Flask(__name__)
 app.config.from_pyfile('/app/config/local.py')
@@ -10,10 +10,10 @@ app.config.from_pyfile('/app/config/local.py')
 init_from_app(app)
 
 # Error handling related
-app.register_error_handler(400, handle_invalid_exception)
+app.register_error_handler(400, handle_bad_request)
 
 # Blueprints related
-from src.user import blueprint as user_blueprint
+from src.blueprints.company import blueprint as user_blueprint
 app.register_blueprint(user_blueprint, url_prefix='/company')
 
 

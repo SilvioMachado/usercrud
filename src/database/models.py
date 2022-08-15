@@ -12,11 +12,29 @@ def default_now():
 
 class ClientCompany(db.Model, SaveMixin):
     id = db.Column(db.Integer, primary_key=True)
+
     company_name = db.Column(db.String(80), nullable=False)
+
     phone = db.Column(db.String(15), nullable=False)
+    """
+    Should contain only numbers. Country code, region code and phone number. 
+    E.g.: 5511954879564. The Integer type serves as constraint here.
+    """
+
     created = db.Column(db.DateTime, default=default_now)
+    """
+    Python datetime, should be set only by the system.
+    """
+
     declared_billing = db.Column(db.DECIMAL(12, 2), nullable=False)
+    """
+    How much money a company has made. For this test project, the time frame is unspecified.
+    """
+
     bank_accounts = db.relationship('CompanyBankAccount', backref='company')
+    """
+    Relation with CompanyBankAccount. Use .add_bank_account()
+    """
 
     def serialize(self, include_id: bool = True) -> Dict:
         _dict = {
@@ -74,9 +92,16 @@ class ClientCompany(db.Model, SaveMixin):
 
 class CompanyBankAccount(db.Model, SaveMixin):
     id = db.Column(db.Integer, primary_key=True)
+
     agency = db.Column(db.String(10), nullable=False)
+
     account_number = db.Column(db.String(10), nullable=False)
+
     bank_code = db.Column(db.String(3), db.ForeignKey('bank.code'), nullable=False)
+    """
+    The 3 digit code that defines the Bank as a Financial Agent. 
+    """
+
     company_id = db.Column(db.Integer, db.ForeignKey('client_company.id'))
 
     def update_from_dict(self, _dict: Dict):
@@ -120,8 +145,14 @@ class CompanyBankAccount(db.Model, SaveMixin):
 
 class Bank(db.Model, SaveMixin):
     id = db.Column(db.Integer, primary_key=True)
+
     code = db.Column(db.String(3), index=True, unique=True, nullable=False)
+    """
+    The 3 digit code that defines the Bank as a Financial Agent. 
+    """
+
     name = db.Column(db.String(50), nullable=False)
+
     user_bank_accounts = db.relationship('CompanyBankAccount', backref='bank')
 
     @property
