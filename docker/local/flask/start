@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+pip install -r requirements/local.txt
+flask --app src --debug run --host=0.0.0.0
