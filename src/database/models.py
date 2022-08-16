@@ -17,7 +17,7 @@ class ClientCompany(db.Model, SaveMixin):
 
     phone = db.Column(db.String(15), nullable=False)
     """
-    Should contain only numbers. Country code, region code and phone number. 
+    Should contain only numbers
     E.g.: 5511954879564. The Integer type serves as constraint here.
     """
 

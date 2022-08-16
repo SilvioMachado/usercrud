@@ -1,10 +1,11 @@
+from os import environ
 from flask import Flask
 
 from src.database.db import init_from_app
 from src.exceptions import InvalidException, handle_bad_request
 
 app = Flask(__name__)
-app.config.from_pyfile('/app/config/local.py')
+app.config.from_pyfile(environ['SETTINGS_MODULE'])
 
 # Database related
 init_from_app(app)

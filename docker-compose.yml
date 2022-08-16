@@ -19,6 +19,8 @@ services:
     volumes:
       - .:/app:z
     command: /start
+    environment:
+      - SETTINGS_MODULE=/app/config/local.py
     depends_on:
       - postgres
 

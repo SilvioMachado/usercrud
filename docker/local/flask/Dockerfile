@@ -4,7 +4,7 @@ ARG APP_HOME=/app
 
 WORKDIR ${APP_HOME}
 
-COPY ./docker/flask/start /start
+COPY ./docker/local/flask/start /start
 COPY . ${APP_HOME}
 
 # Install depencies.

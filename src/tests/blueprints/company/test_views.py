@@ -239,14 +239,30 @@ def test_add_same_bank_account(http_client, company_with_bank):
     assert len(refreshed_company.bank_accounts) == 1
     assert response.status_code == 400
 
-def test_invalid_create_company(http_client):
+
+@pytest.mark.parametrize(
+    'broken_field',
+    [
+        {'phone': 'ak-47'},
+        {'declared_billing': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'},
+        {'bank_accounts': 'O bolo é uma mentira'},
+        {'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'declared_billing'},
+        {'id': 23},  # If someone tries to change the ID in the database.
+    ]
+)
+def test_invalid_create_company(http_client, broken_field):
+    """
+    Each time run the test with a valid request but ONE different invalid
+    field.
+    """
     # Given
     path = '/company/'
     request_body = {
         'company_name': 'My Company',
-        'phone': '11asd-978235674',    # Invalid Integer
+        'phone': '11978235674',    # Invalid Integer
         'declared_billing': 123.02
     }
+    request_body.update(broken_field)
 
     # When
     response = http_client.post(path, json=request_body)
